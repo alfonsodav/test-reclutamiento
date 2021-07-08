@@ -1,11 +1,29 @@
 from rest_framework import serializers
 from .models import *
+import re
 
 
 class ReservaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reserva
-        fields = ['estatus', 'duracion', 'cliente', 'habitaciones', 'fecha_entrada', 'fecha_salida']
+        fields = '__all__'
+
+    def create(self, data):
+        print(data)
+        costos = 0
+        duracion = data['duracion']
+        habitaciones = data['habitaciones']
+        for h in habitaciones:
+            numero = re.search('[0-9]+', str(h)).group()
+            habitacion = Habitacion.objects.get(numero=numero)
+            costos = costos + habitacion.costo_dia * duracion
+
+        data.pop('habitaciones')
+        data['monto_pagar'] = costos
+        reserva = Reserva.objects.create(**data)
+        reserva.habitaciones.set(habitaciones)
+        self.context['reserva'] = reserva
+        return self.context['reserva']
 
 
 class HotelSerializer(serializers.ModelSerializer):

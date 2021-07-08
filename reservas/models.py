@@ -18,7 +18,8 @@ class Hotel(models.Model):
 class Habitacion(models.Model):
     piso = models.IntegerField(null=False)
     numero = models.IntegerField(null=False)
-    tipo = models.CharField('tipo de habitacion', max_length=15)
+    tipo = models.CharField('tipo de habitacion', max_length=15),
+    costo_dia = models.FloatField('costo diario', default=0)
 
     class Meta:
         verbose_name_plural = "Habitaciones"
@@ -43,16 +44,19 @@ class Reserva(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.DO_NOTHING)
     fecha_entrada = models.DateField('Fecha de entrada')
     fecha_salida = models.DateField('Fecha de salida')
+    monto_pagar = models.FloatField('Monto a pagar', default=0)
 
     def __str__(self):
         return str(self.fecha_entrada)
 
 
 class Factura(models.Model):
-    Hotel = models.ForeignKey(Hotel, on_delete=models.DO_NOTHING)
+    opciones = [('TRANSFERENCIA', 'transferencia'), ('EFECTIVO', 'efectivo'), ('CHEQUE', 'cheque')]
+    hotel = models.ForeignKey(Hotel, on_delete=models.DO_NOTHING)
     cliente = models.ForeignKey(Cliente, on_delete=models.DO_NOTHING)
     reserva = models.ForeignKey(Reserva, on_delete=models.DO_NOTHING)
     fecha = models.DateField(auto_created=True, default=datetime.date.today(), blank=True, null=True)
+    metodo_pago = models.CharField('metodo de pago', max_length=20, choices=opciones)
 
     def __str__(self):
         return '{} {}'.format(self.cliente.nombre, self.reserva)

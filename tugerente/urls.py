@@ -21,7 +21,7 @@ from reservas.views import *
 router = routers.DefaultRouter()
 router.register(r'hotel', HotelView)
 router.register(r'habitacion', HabitacionView)
-router.register(r'Cliente', ClienteView)
+router.register(r'cliente', ClienteView)
 router.register(r'reservar', ReservaView)
 router.register(r'factura', FacturaView)
 
